@@ -881,6 +881,7 @@ function ckeditor5_get_acf_settings($format) {
 
   // When all HTML is allowed, also set allowedContent to true and
   // disallowedContent to false.
+  // @todo this needs to change.
   if ($html_restrictions === TRUE) {
     return array(TRUE, FALSE);
   }
@@ -896,8 +897,7 @@ function ckeditor5_get_acf_settings($format) {
       }
     }));
     if (count($values)) {
-      // @todo A string is unlikely to be correct.
-      return implode(',', $values);
+      return $values;
     }
     else {
       return NULL;
@@ -997,13 +997,15 @@ function ckeditor5_get_acf_settings($format) {
       });
       if (count($allowed_attributes)) {
         $allowed[$tag]['name'] = $tag;
-        $allowed[$tag]['attributes'] = $allowed_attributes['attributes'];
-      }
-      if (isset($allowed_attributes['style']) && is_array($allowed_attributes['style'])) {
-        $allowed[$tag]['styles'] = $allowed_attributes['style'];
-      }
-      if (isset($allowed_attributes['class']) && is_array($allowed_attributes['class'])) {
-        $allowed[$tag]['classes'] = $allowed_attributes['class'];
+        if (isset($allowed[$tag]['attributes'])) {
+          $allowed[$tag]['attributes'] = $allowed_attributes['attributes'];
+        }
+        if (isset($allowed_attributes['style']) && is_array($allowed_attributes['style'])) {
+          $allowed[$tag]['styles'] = $allowed_attributes['style'];
+        }
+        if (isset($allowed_attributes['class']) && is_array($allowed_attributes['class'])) {
+          $allowed[$tag]['classes'] = $allowed_attributes['class'];
+        }
       }
 
       // Handle disallowed attributes analogously. However, to handle *dis-
@@ -1019,10 +1021,10 @@ function ckeditor5_get_acf_settings($format) {
 
       if (count($disallowed_attributes)) {
         $disallowed[$tag]['name'] = $tag;
+
         // No need to blacklist the 'class' or 'style' attributes; CKEditor
         // handles them separately (if no specific class or style attribute
         // values are allowed, then those attributes are disallowed).
-        // @todo is above still true, anyway?
         if (isset($disallowed_attributes['class'])) {
           unset($disallowed_attributes['class']);
         }
@@ -1046,6 +1048,9 @@ function ckeditor5_get_acf_settings($format) {
     }
   }
 
+  // Unset the Filter module wildcard item, CKEditor will ignore it, anyway. It
+  // has been used to apply settings to individual tags above.
+  unset($allowed['*']);
   // CKEditor htmlSupport arrays are not supposed to be keyed.
   $allowed = array_values($allowed);
   $disallowed = array_values($disallowed);
