@@ -1034,8 +1034,10 @@ function ckeditor5_get_acf_settings($format) {
       // implies that all of its possible attribute values are disallowed,
       // thus we must look at the disallowed attribute values on allowed
       // attributes.
+      //
       // @todo Regex is not working, so on* attributes will not get stripped by
-      // the editor. The filter still gets applied on markup after saving.
+      // the editor in case attributes are allowed. The filter still gets
+      // applied on markup after saving.
       $disallowed_attributes = array_filter($attributes, function($value) {
         return $value === FALSE;
       });
@@ -1070,7 +1072,7 @@ function ckeditor5_get_acf_settings($format) {
   }
 
   // Unset the Filter module wildcard item, CKEditor will ignore it, anyway. It
-  // has been used to apply settings to individual tags above.
+  // has been used above to apply settings to individual tags.
   unset($allowed['*']);
   // CKEditor htmlSupport arrays are not supposed to be keyed.
   $allowed = array_values($allowed);
