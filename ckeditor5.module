@@ -646,11 +646,26 @@ function ckeditor5_form_filter_format_editor_link_form_alter(&$form, $form_state
  *   TRUE if the image plugin is enabled, FALSE otherwise.
  */
 function ckeditor5_image_plugin_check($format, $plugin_name) {
+<<<<<<< HEAD
   // Automatically enable caption support if the BackdropImage button is
   // enabled.
   if (in_array('backdropImage', $format->editor_settings['cketoolbar'])) {
     return TRUE;
+
+  // Automatically enable caption support if the BackdropImage button is enabled.
+  foreach ($format->editor_settings['toolbar'] as $row) {
+    // @todo Only a workaround for problems with CKEditor5, which has no
+    // groups. Returning TRUE breaks the editor. Has to get fixed elsewhere.
+    if (is_string($row)) {
+      continue;
+    }
+    foreach ($row as $button_group) {
+      if (in_array('BackdropImage', $button_group['items'])) {
+        return TRUE;
+      }
+    }
   }
+
   return FALSE;
 }
 
@@ -887,7 +902,13 @@ function ckeditor5_get_acf_settings($format) {
     return array(array(), array());
   }
 
+<<<<<<< HEAD
   // Converts Backdrop-stored attribute values to CKEditor attribute lists.
+=======
+  /**
+   * Converts Backdrop-stored attribute values to CKEditor attribute lists.
+   */
+>>>>>>> 0a034a2 (Merge conflict resolve)
   $get_attribute_values = function($attribute_values, $allowed_values) {
     $values = array_keys(array_filter($attribute_values, function($value) use ($allowed_values) {
       if ($allowed_values) {
@@ -948,8 +969,6 @@ function ckeditor5_get_acf_settings($format) {
       // for either the "style" or "class" attribute, it cannot possibly be
       // more permissive than what was set above. Hence: inherit from the
       // "*" tag where possible.
-      //
-      // @todo This is set by the filter module, but we need to switch to regex.
       if (isset($html_restrictions['allowed']['*'])) {
         $wildcard = $html_restrictions['allowed']['*'];
         if (isset($wildcard['style'])) {
@@ -1015,7 +1034,8 @@ function ckeditor5_get_acf_settings($format) {
       // implies that all of its possible attribute values are disallowed,
       // thus we must look at the disallowed attribute values on allowed
       // attributes.
-      // @todo Fix disallowed array, switch to regex, fix regex not working at all.
+      // @todo Regex is not working, so on* attributes will not get stripped by
+      // the editor. The filter still gets applied on markup after saving.
       $disallowed_attributes = array_filter($attributes, function($value) {
         return $value === FALSE;
       });
