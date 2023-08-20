@@ -763,9 +763,11 @@ function ckeditor5_get_config($format, array $existing_settings) {
     }
   }
 
-  // Add the allowedContent setting, which ensures CKEditor only allows tags
-  // and attributes that are allowed by the text format for this text editor.
-  // list($config['allowedContent'], $config['disallowedContent']) = ckeditor5_get_acf_settings($format);
+  // Add "allow" and "disallow" for CKEditor GeneralHtmlSupportConfig to apply
+  // settings from the Filter module. Prevents data loss for content not handled
+  // by editor plugins.
+  $config['htmlSupport'] = array();
+  list($config['htmlSupport']['allow'], $config['htmlSupport']['disallow']) = ckeditor5_get_acf_settings($format);
 
   // Create a token for access to dialogs.
   if (in_array('backdropLink.BackdropLink', $plugin_list)) {
@@ -871,19 +873,18 @@ function ckeditor5_get_config($format, array $existing_settings) {
  *
  * @return array
  *   An array with two values:
- *   - the first value is the "allowedContent" setting: a well-formatted array
- *     or TRUE. The latter indicates that anything is allowed.
- *   - the second value is the "disallowedContent" setting: a well-formatted
- *     array or FALSE. The latter indicates that nothing is disallowed.
+ *   - Configuration array of allowed content rules used by the editor's
+ *     General HTML Support "allow" setting.
+ *   - Configuration array of disallowed content rules used by the editor's
+ *     General HTML Support "disallow" setting.
  */
 function ckeditor5_get_acf_settings($format) {
   $html_restrictions = filter_format_allowed_html($format);
 
-  // When all HTML is allowed, also set allowedContent to true and
-  // disallowedContent to false.
-  // @todo this needs to change.
+  // The absence of filter restrictions will not prevent CKEditor applying its
+  // own restrictions for unhandled tags.
   if ($html_restrictions === TRUE) {
-    return array(TRUE, FALSE);
+    return array(array(), array());
   }
 
   // Converts Backdrop-stored attribute values to CKEditor attribute lists.
