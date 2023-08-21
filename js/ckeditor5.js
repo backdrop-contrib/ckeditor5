@@ -28,6 +28,16 @@
 
       editorSettings.licenseKey = '';
 
+      // @todo Experimental approach to let CKEditor filter out attributes like
+      // "onclick". Hardcoded for now.
+      // Regex patterns can not work when provided by PHP via JSON config.
+      // On the other hand it's probably too late here for an API.
+      var patternOnEvent = {
+        'name': /.*/,
+        'attributes': /^on.*/
+      }
+      editorSettings.htmlSupport.disallow.push(patternOnEvent);
+
       // Convert the plugin list from strings to variable names. Each CKEditor
       // plugin is located under "CKEditor5.[packageName].[moduleName]". So
       // we convert the list of strings to match the expected variable name.
