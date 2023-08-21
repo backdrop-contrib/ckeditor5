@@ -757,6 +757,11 @@ function ckeditor5_get_config($format, array $existing_settings) {
   // when passed to the front-end JavaScript.
   $plugin_list = array_values(array_unique($plugins));
 
+  // We always load the GeneralHtmlSupport plugin.
+  if (!in_array('htmlSupport.GeneralHtmlSupport', $plugin_list)) {
+    $plugin_list[] = 'htmlSupport.GeneralHtmlSupport';
+  }
+
   // Initialize reasonable defaults that provide expected basic behavior.
   $config = array(
     'language' => $language->langcode,
