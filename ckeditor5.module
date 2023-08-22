@@ -1040,16 +1040,14 @@ function ckeditor5_get_acf_settings($format) {
       // thus we must look at the disallowed attribute values on allowed
       // attributes.
       //
-      // @todo Regex is not working, so on* attributes will not get stripped by
-      // the editor in case attributes are allowed. The filter still gets
-      // applied on markup after saving.
+      // @todo Placeholder "*" is not working. The filter still gets applied to
+      // markup after saving. But for CKEditor5 it's meaningless.
+      // @see ckeditor5.js
       $disallowed_attributes = array_filter($attributes, function($value) {
         return $value === FALSE;
       });
-
       if (count($disallowed_attributes)) {
         $disallowed[$tag]['name'] = $tag;
-
         // No need to blacklist the 'class' or 'style' attributes; CKEditor
         // handles them separately (if no specific class or style attribute
         // values are allowed, then those attributes are disallowed).
