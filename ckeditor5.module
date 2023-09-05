@@ -653,12 +653,8 @@ function ckeditor5_image_plugin_check($format, $plugin_name) {
     return TRUE;
 
   // Automatically enable caption support if the BackdropImage button is enabled.
-  foreach ($format->editor_settings['toolbar'] as $row) {
-    foreach ($row as $button_group) {
-      if (in_array('BackdropImage', $button_group['items'])) {
-        return TRUE;
-      }
-    }
+  if (in_array('backdropImage', $format->editor_settings['cketoolbar'])) {
+    return TRUE;
   }
 
   return FALSE;
