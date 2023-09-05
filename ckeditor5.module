@@ -716,11 +716,7 @@ function ckeditor5_get_config($format, array $existing_settings) {
 
   // Record needed plugins based on use in the toolbar.
   $toolbar = array();
-<<<<<<< HEAD
   foreach ($format->editor_settings['cketoolbar'] as $button_name) {
-=======
-  foreach ($format->editor_settings['toolbar'] as $button_name) {
->>>>>>> c365388 (Revert obsolete workarounds)
     // Sanity check that the button exists in our installation.
     if (isset($all_buttons[$button_name])) {
       // Add in the button parent's overall plugin and its dependencies.
