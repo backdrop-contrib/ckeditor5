@@ -1,5 +1,5 @@
 name: Functional Tests
-on: [pull_request]
+on: [push, pull_request]
 jobs:
   simpletest:
     name: Run Simpletest

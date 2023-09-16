@@ -1,5 +1,5 @@
 name: Code Checks
-on: [pull_request]
+on: [push, pull_request]
 jobs:
   codechecks:
     name: phpcs
