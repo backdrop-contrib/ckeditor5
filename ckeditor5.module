@@ -898,13 +898,7 @@ function ckeditor5_get_acf_settings($format) {
     return array(array(), array());
   }
 
-<<<<<<< HEAD
   // Converts Backdrop-stored attribute values to CKEditor attribute lists.
-=======
-  /**
-   * Converts Backdrop-stored attribute values to CKEditor attribute lists.
-   */
->>>>>>> 0a034a2 (Merge conflict resolve)
   $get_attribute_values = function($attribute_values, $allowed_values) {
     $values = array_keys(array_filter($attribute_values, function($value) use ($allowed_values) {
       if ($allowed_values) {
