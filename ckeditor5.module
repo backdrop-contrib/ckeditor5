@@ -651,7 +651,6 @@ function ckeditor5_image_plugin_check($format, $plugin_name) {
   if (in_array('backdropImage', $format->editor_settings['cketoolbar'])) {
     return TRUE;
   }
-
   return FALSE;
 }
 
