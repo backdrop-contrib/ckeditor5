@@ -886,8 +886,8 @@ function ckeditor5_get_config($format, array $existing_settings) {
 function ckeditor5_get_acf_settings($format) {
   $html_restrictions = filter_format_allowed_html($format);
 
-  // The absence of filter restrictions will not prevent CKEditor applying its
-  // own restrictions for unhandled tags.
+  // When all HTML is allowed, we return empty arrays. This case gets handled in
+  // js/ckeditor5.js.
   if ($html_restrictions === TRUE) {
     return array(array(), array());
   }
@@ -1018,14 +1018,15 @@ function ckeditor5_get_acf_settings($format) {
       // implies that all of its possible attribute values are disallowed,
       // thus we must look at the disallowed attribute values on allowed
       // attributes.
-      //
-      // @todo Placeholder "*" is not working. The filter still gets applied to
-      // markup after saving. But for CKEditor5 it's meaningless.
-      // @see ckeditor5.js
       $disallowed_attributes = array_filter($attributes, function($value) {
         return $value === FALSE;
       });
       if (count($disallowed_attributes)) {
+        // This pattern has no meaning for CKEditor5.
+        // @see js/ckeditor5.js
+        if ($tag == '*') {
+          continue;
+        }
         $disallowed[$tag]['name'] = $tag;
         // No need to disallow the 'class' or 'style' attributes; CKEditor
         // handles them separately (if no specific class or style attribute
@@ -1053,9 +1054,6 @@ function ckeditor5_get_acf_settings($format) {
     }
   }
 
-  // Unset the Filter module wildcard item, CKEditor will ignore it, anyway. It
-  // has been used above to apply settings to individual tags.
-  unset($allowed['*']);
   // CKEditor htmlSupport arrays are not supposed to be keyed.
   $allowed = array_values($allowed);
   $disallowed = array_values($disallowed);
