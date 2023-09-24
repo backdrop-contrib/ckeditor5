@@ -1022,8 +1022,9 @@ function ckeditor5_get_generic_html_settings($format) {
         return $value === FALSE;
       });
       if (count($disallowed_attributes)) {
-        // This pattern has no meaning for CKEditor5.
-        // @see js/ckeditor5.js
+        // A simple "*" placeholder has no meaning for CKEditor5, we catch that
+        // in js/ckeditor5.js by using proper RegExp.
+        // @see https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_view_matcher-MatcherPattern.html
         if ($tag == '*') {
           continue;
         }
