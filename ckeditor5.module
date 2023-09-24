@@ -772,7 +772,7 @@ function ckeditor5_get_config($format, array $existing_settings) {
   // settings from the Filter module. Prevents data loss for content not handled
   // by editor plugins.
   $config['htmlSupport'] = array();
-  list($config['htmlSupport']['allow'], $config['htmlSupport']['disallow']) = ckeditor5_get_acf_settings($format);
+  list($config['htmlSupport']['allow'], $config['htmlSupport']['disallow']) = ckeditor5_get_generic_html_settings($format);
 
   // Create a token for access to dialogs.
   if (in_array('backdropLink.BackdropLink', $plugin_list)) {
@@ -883,7 +883,7 @@ function ckeditor5_get_config($format, array $existing_settings) {
  *   - Configuration array of disallowed content rules used by the editor's
  *     General HTML Support "disallow" setting.
  */
-function ckeditor5_get_acf_settings($format) {
+function ckeditor5_get_generic_html_settings($format) {
   $html_restrictions = filter_format_allowed_html($format);
 
   // When all HTML is allowed, we return empty arrays. This case gets handled in
