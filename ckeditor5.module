@@ -515,6 +515,7 @@ function ckeditor5_ckeditor5_plugins() {
           'image.ImageToolbar',
           'image.ImageInsertUI',
           'image.ImageUpload',
+          'image.ImageResize',
         ),
         'required_html' => array(
           '<img src alt height width data-file-id>',
@@ -532,6 +533,7 @@ function ckeditor5_ckeditor5_plugins() {
         'upload' => array(
           'type' => image_get_supported_extensions(),
         ),
+        'resizeUnit' => 'px',
       ),
       'backdropImage' => array(
         'editLabel' => t('Edit Image'),

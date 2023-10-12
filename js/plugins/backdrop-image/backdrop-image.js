@@ -41,6 +41,9 @@ class BackdropImage extends CKEditor5.core.Plugin {
     const { conversion } = editor;
     const { schema } = editor.model;
     const config = editor.config.get('backdropImage');
+    const insertLabel = config.insertLabel || 'Insert Image';
+    const editLabel = config.editLabel || 'Edit Image';
+
     if (!config.extraAttributes) {
       return;
     }
@@ -125,33 +128,44 @@ class BackdropImage extends CKEditor5.core.Plugin {
       const command = editor.commands.get('backdropImage');
       const buttonView = new CKEditor5.ui.ButtonView(locale);
       buttonView.set({
-        label: config.editLabel || 'Edit Image',
+        label: editLabel,
         icon: CKEditor5.core.icons.pencil,
         tooltip: true
       });
 
-      this.listenTo(buttonView, 'execute', () => {
+      // When clicking the balloon button, execute the backdropImage command.
+      buttonView.on('execute', () => {
         command.execute();
       });
 
       return buttonView;
     });
 
-    // Add the backdropImage button to the main toolbar.
+    // Add the backdropImage button for use in the main toolbar. This can
+    // insert a new image or edit an existing one if selected.
     editor.ui.componentFactory.add('backdropImage', (locale) => {
       const buttonView = new CKEditor5.ui.ButtonView(locale);
       const command = editor.commands.get('backdropImage');
 
       buttonView.set({
-        label: config.insertLabel || 'Insert Image',
+        label: insertLabel,
         icon: CKEditor5.core.icons.image,
         tooltip: true
       });
 
-      // @todo This should highlight the image button when an image is selected.
-      buttonView.bind('isOn').to(command, 'isOn');
+      // Highlight the image button when an image is selected.
+      buttonView.bind('isOn').to(command, 'value');
 
-      this.listenTo(buttonView, 'execute', () => {
+      // Change the label when an image is selected.
+      buttonView.bind('label').to(command, 'value', (value) => {
+        return value ? editLabel : insertLabel
+      });
+
+      // Disable the button when the command is disabled by source mode.
+      buttonView.bind('isEnabled').to(command, 'isEnabled');
+
+      // When clicking the toolbar button, execute the backdropImage command.
+      buttonView.on('execute', () => {
         command.execute();
       });
 
@@ -733,7 +747,7 @@ class BackdropImageCommand extends CKEditor5.core.Command {
     const imageUtils = editor.plugins.get('ImageUtils');
     const element = imageUtils.getClosestSelectedImageElement(this.editor.model.document.selection);
     this.isEnabled = true;
-    this.isOn = !!element;
+    this.value = !!element;
   }
 
   /**
