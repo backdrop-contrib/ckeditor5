@@ -23,7 +23,7 @@ class BackdropImage extends CKEditor5.core.Plugin {
    * @inheritdoc
    */
   static get requires() {
-    return ['ImageUtils', 'FileRepository'];
+    return ['ImageUtils', 'FileRepository', 'Image', 'WidgetToolbarRepository', 'ContextualBalloon'];
   }
 
   /**
@@ -40,27 +40,20 @@ class BackdropImage extends CKEditor5.core.Plugin {
     const editor = this.editor;
     const { conversion } = editor;
     const { schema } = editor.model;
-    const options = editor.config.get('backdropImage');
-
-    if (schema.isRegistered('imageInline')) {
-      schema.extend('imageInline', {
-        allowAttributes: [
-          'dataFileId',
-          'isDecorative',
-          'width',
-          'height',
-        ],
-      });
+    const config = editor.config.get('backdropImage');
+    if (!config.extraAttributes) {
+      return;
     }
 
+    // Add extra supported attributes to the image models.
+    if (schema.isRegistered('imageInline')) {
+      schema.extend('imageInline', {
+        allowAttributes: Object.keys(config.extraAttributes)
+      });
+    }
     if (schema.isRegistered('imageBlock')) {
       schema.extend('imageBlock', {
-        allowAttributes: [
-          'dataFileId',
-          'isDecorative',
-          'width',
-          'height',
-        ],
+        allowAttributes: Object.keys(config.extraAttributes)
       });
     }
 
@@ -123,32 +116,54 @@ class BackdropImage extends CKEditor5.core.Plugin {
       .add(modelImageHeightToAttribute())
       .add(downcastBlockImageLink());
 
-    // Add the backdropImage toolbar button.
-    editor.ui.componentFactory.add('backdropImage', () => {
-      // Use upstream insertImage component when ImageInsertUI is enabled. The
-      // upstream insertImage button supports inserting of external images
-      // and uploading images. Out-of-the-box Drupal only uses the insertImage
-      // button for inserting external images.
-      if (editor.plugins.has('ImageInsertUI')) {
-        return editor.ui.componentFactory.create('insertImage');
-      }
-      // If ImageInsertUI plugin is not enabled, fallback to using uploadImage
-      // upstream button.
-      if (editor.plugins.has('ImageUpload')) {
-        return editor.ui.componentFactory.create('uploadImage');
-      }
+    // Add the editBackdropImage command.
+    editor.commands.add('backdropImage', new BackdropImageCommand(editor));
 
-      throw new Error(
-        'backdropImage requires either ImageUpload or ImageInsertUI plugin to be enabled.',
-      );
+    // Add the editBackdropImage button, for use in the balloon toolbar.
+    // This button has a different icon than the main toolbar button.
+    editor.ui.componentFactory.add('editBackdropImage', (locale) => {
+      const command = editor.commands.get('backdropImage');
+      const buttonView = new CKEditor5.ui.ButtonView(locale);
+      buttonView.set({
+        label: config.editLabel || 'Edit Image',
+        icon: CKEditor5.core.icons.pencil,
+        tooltip: true
+      });
+
+      this.listenTo(buttonView, 'execute', () => {
+        command.execute();
+      });
+
+      return buttonView;
+    });
+
+    // Add the backdropImage button to the main toolbar.
+    editor.ui.componentFactory.add('backdropImage', (locale) => {
+      const buttonView = new CKEditor5.ui.ButtonView(locale);
+      const command = editor.commands.get('backdropImage');
+
+      buttonView.set({
+        label: config.insertLabel || 'Insert Image',
+        icon: CKEditor5.core.icons.image,
+        tooltip: true
+      });
+
+      // @todo This should highlight the image button when an image is selected.
+      buttonView.bind('isOn').to(command, 'isOn');
+
+      this.listenTo(buttonView, 'execute', () => {
+        command.execute();
+      });
+
+      return buttonView;
     });
 
     // Attach the file upload adapter to handle saving files.
-    if (!options.uploadUrl) {
+    if (!config.uploadUrl) {
       throw new Error('Missing backdropImage.uploadUrl configuration option.');
     }
     editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-      return new BackdropImageUploadAdapter(loader, options);
+      return new BackdropImageUploadAdapter(loader, config);
     };
 
     // Upon completing an uploaded file, save the returned File ID.
@@ -158,8 +173,8 @@ class BackdropImage extends CKEditor5.core.Plugin {
         writer.setAttribute('dataFileId', data.response.fileId, imageElement);
       });
     });
-
   }
+
 }
 
 // Expose the plugin to the CKEditor5 namespace.
@@ -707,6 +722,72 @@ function downcastBlockImageLink() {
       priority: 'high',
     });
   };
+}
+
+class BackdropImageCommand extends CKEditor5.core.Command {
+  /**
+   * @inheritdoc
+   */
+  refresh() {
+    const editor = this.editor;
+    const imageUtils = editor.plugins.get('ImageUtils');
+    const element = imageUtils.getClosestSelectedImageElement(this.editor.model.document.selection);
+    this.isEnabled = true;
+    this.isOn = !!element;
+  }
+
+  /**
+   * Executes the command.
+   */
+  execute() {
+    const editor = this.editor;
+    const config = editor.config.get('backdropImage');
+    const imageUtils = editor.plugins.get('ImageUtils');
+    const model = editor.model;
+    const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection );
+
+    // Convert attributes to map for easier looping.
+    const extraAttributes = new Map(Object.entries(config.extraAttributes));
+
+    const uploadsEnabled = true; // @todo Set dynamically.
+    let existingValues = {};
+
+    if (imageElement) {
+      extraAttributes.forEach((attributeName, modelName) => {
+        existingValues[attributeName] = imageElement.getAttribute(attributeName);
+      });
+    }
+
+    const saveCallback = (dialogValues) => {
+      // Map the submitted form values to the CKEditor image model.
+      let imageAttributes = {};
+      extraAttributes.forEach((attributeName, modelName) => {
+        if (dialogValues.attributes[attributeName] !== undefined) {
+          imageAttributes[modelName] = dialogValues.attributes[attributeName];
+        }
+      });
+
+      // For updating an existing element:
+      if (imageElement) {
+        model.change(writer => {
+          writer.setAttributes(imageAttributes, imageElement);
+        });
+      }
+      // Inserting a new element:
+      else {
+        // Inserting an image has an unusual way of passing the attributes.
+        // See https://ckeditor.com/docs/ckeditor5/latest/api/module_image_image_insertimagecommand-InsertImageCommand.html
+        editor.execute('insertImage', { source: [imageAttributes] });
+      }
+    };
+
+    const dialogSettings = {
+      title: config.insertLabel || 'Insert Image',
+      uploads: uploadsEnabled,
+      dialogClass: 'editor-image-dialog'
+    };
+    Backdrop.ckeditor5.openDialog(editor, config.dialogUrl, existingValues, saveCallback, dialogSettings);
+  }
 }
 
 /**
