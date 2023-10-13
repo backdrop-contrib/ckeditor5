@@ -300,6 +300,8 @@ function modelFileIdToDataAttribute() {
 }
 
 /**
+ * A mapping between the CKEditor model names and the data-align attribute.
+ *
  * @type {Array.<{dataValue: string, modelValue: string}>}
  */
 const alignmentMapping = [
@@ -671,7 +673,7 @@ function viewImageToModelImage(editor) {
       attributes: attributesToConsume,
     });
 
-    // Make sure `modelRange` and `modelCursor` is up to date after inserting
+    // Make sure `modelRange` and `modelCursor` is up-to-date after inserting
     // new nodes into the model.
     updateConversionResult(image, data);
   }
