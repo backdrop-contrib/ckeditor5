@@ -545,7 +545,7 @@ function ckeditor5_ckeditor5_plugins() {
         'extraAttributes' => array(
           'dataAlign' => 'data-align',
           'dataFileId' => 'data-file-id',
-          'dataHasCaption' => 'data-has-caption',
+          'dataCaption' => 'data-caption',
           'alt' => 'alt',
           'src' => 'src',
           'width' => 'width',
@@ -564,13 +564,20 @@ function ckeditor5_ckeditor5_plugins() {
     'required_html' => array(
       '<img data-caption>',
       '<figure>',
-      '<figcaption data-placeholder>',
+      '<figcaption>',
     ),
+    // The BackdropImage plugin builds on CKEditor's ImageCaptionEditing plugin.
+    'plugin_dependencies' => array('image.ImageCaption'),
     'config' => array(
+      'image' => array(
+        'toolbar' => array(
+          'toggleImageCaption',
+        ),
+      ),
       'backdropImage' => array(
         'captionFilterEnabled' => TRUE,
         'captionPlaceholderText' => t('Enter caption text here.')
-      )
+      ),
     ),
   );
 
@@ -599,6 +606,7 @@ function ckeditor5_ckeditor5_plugins() {
           'imageStyle:alignCenter',
           'imageStyle:alignRight',
           'imageStyle:inline',
+          '|',
         ),
         // Configure the style buttons that were added above.
         'styles' => array(

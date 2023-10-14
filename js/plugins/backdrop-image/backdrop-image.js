@@ -60,7 +60,7 @@ class BackdropImage extends CKEditor5.core.Plugin {
       });
     }
 
-    // Conversion.
+    // Upcast from the raw <img> element to the CKEditor model.
     conversion
       .for('upcast')
       .add(viewImageToModelImage(editor))
@@ -95,13 +95,13 @@ class BackdropImage extends CKEditor5.core.Plugin {
         },
       });
 
-    conversion
-      .for('downcast')
-      .add(modelFileIdToDataAttribute());
-
+    // Downcast from the CKEditor model to an HTML <img> element.
     conversion
       .for('dataDowncast')
+      // Pull out the caption if present. This needs to be done before other
+      // conversions because afterward the caption element is eleminated.
       .add(viewCaptionToCaptionAttribute(editor))
+      // Create a blank image element, removing any wrapping figure element.
       .elementToElement({
         model: 'imageBlock',
         view: (modelElement, { writer }) =>
@@ -114,9 +114,14 @@ class BackdropImage extends CKEditor5.core.Plugin {
           createImageViewElement(writer, 'imageInline'),
         converterPriority: 'high',
       })
+      // Convert the FileId to data-file-id attribute.
+      .add(modelFileIdToDataAttribute())
+      // Convert ImageStyle to data-align attribute.
       .add(modelImageStyleToDataAttribute())
+      // Convert height and width attributes.
       .add(modelImageWidthToAttribute())
       .add(modelImageHeightToAttribute())
+      // Convert any link to wrap the <img> tag.
       .add(downcastBlockImageLink());
 
     // Add the editBackdropImage command.
@@ -256,8 +261,7 @@ function isNumberString(value) {
 }
 
 /**
- * Generates a callback that saves the entity UUID to an attribute on data
- * downcast.
+ * Generates a callback that saves the Filed ID to an attribute on downcast.
  *
  * @return {function}
  *  Callback that binds an event to its parameter.
