@@ -32,9 +32,9 @@ See https://ckeditor.com/docs/ckeditor5/latest/installation/advanced/alternative
    lib/ckeditor5/build/
 6. Update the CKEDITOR5_VERSION constant in ckeditor5.module
 
-## Find version number
+## Determine version number
 
-When downloading via npm, the directory you run concat-build.sh in will then
+When downloading via npm, the directory you run concat-build.sh in, will then
 contain a package.json file, where you can find the version number.
 
 ## Testing
