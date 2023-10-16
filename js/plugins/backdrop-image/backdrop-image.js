@@ -324,6 +324,38 @@ const alignmentMapping = [
 ];
 
 /**
+ * Given an imageStyle, return the associated Backdrop data-align attribute.
+ *
+ * @param string imageStyle
+ *   The image style such as alignLeft, alignCenter, or alignRight.
+ * @returns {string|null}
+ *   The data attribute value such as left, center, or right.
+ * @private
+ */
+function _getDataAttributeFromModelImageStyle(imageStyle) {
+  const mappedAlignment = alignmentMapping.find(
+    (value) => value.modelValue === imageStyle,
+  );
+  return mappedAlignment ? mappedAlignment.dataValue : null;
+}
+
+/**
+ * Given a data-attribute, return the associated Backdrop data-align attribute.
+ *
+ * @param string dataAttribute
+ *   The data attribute value such as left, center, or right.
+ * @returns {string|null}
+ *   The image style such as alignLeft, alignCenter, or alignRight.
+ * @private
+ */
+function _getModelImageStyleFromDataAttribute(dataAttribute) {
+  const mappedAlignment = alignmentMapping.find(
+    (value) => value.dataValue === dataAttribute,
+  );
+  return mappedAlignment ? mappedAlignment.modelValue : null;
+}
+
+/**
  * Downcasts `caption` model to `data-caption` attribute with its content
  * downcasted to plain HTML.
  *
@@ -441,12 +473,10 @@ function modelImageStyleToDataAttribute() {
     const { item } = data;
     const { consumable, writer } = conversionApi;
 
-    const mappedAlignment = alignmentMapping.find(
-      (value) => value.modelValue === data.attributeNewValue,
-    );
+    const alignAttribute = _getDataAttributeFromModelImageStyle(data.attributeNewValue);
 
     // Consume only for the values that can be converted into data-align.
-    if (!mappedAlignment || !consumable.consume(item, event.name)) {
+    if (!alignAttribute || !consumable.consume(item, event.name)) {
       return;
     }
 
@@ -457,7 +487,7 @@ function modelImageStyleToDataAttribute() {
 
     writer.setAttribute(
       'data-align',
-      mappedAlignment.dataValue,
+      alignAttribute,
       imageInFigure || viewElement,
     );
   }
@@ -614,12 +644,10 @@ function viewImageToModelImage(editor) {
       consumable.test(viewItem, { name: true, attributes: 'data-align' })
     ) {
       const dataAlign = viewItem.getAttribute('data-align');
-      const mappedAlignment = alignmentMapping.find(
-        (value) => value.dataValue === dataAlign,
-      );
+      const imageStyle = _getModelImageStyleFromDataAttribute(dataAlign);
 
-      if (mappedAlignment) {
-        writer.setAttribute('imageStyle', mappedAlignment.modelValue, image);
+      if (imageStyle) {
+        writer.setAttribute('imageStyle', imageStyle, image);
 
         // Make sure the attribute can be consumed after successful `safeInsert`
         // operation.
@@ -763,8 +791,9 @@ class BackdropImageCommand extends CKEditor5.core.Command {
     const editor = this.editor;
     const config = editor.config.get('backdropImage');
     const imageUtils = editor.plugins.get('ImageUtils');
+    const ImageCaptionUtils = editor.plugins.get('ImageCaptionUtils');
     const model = editor.model;
-    const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection );
+    const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
 
     // Convert attributes to map for easier looping.
     const extraAttributes = new Map(Object.entries(config.extraAttributes));
@@ -773,11 +802,26 @@ class BackdropImageCommand extends CKEditor5.core.Command {
     let existingValues = {};
 
     if (imageElement) {
+      // Most attributes can be directly mapped from the model.
       extraAttributes.forEach((attributeName, modelName) => {
-        existingValues[attributeName] = imageElement.getAttribute(attributeName);
+        existingValues[attributeName] = imageElement.getAttribute(modelName);
       });
-    }
 
+      // Alignment is stored as a CKEditor Image Style.
+      const imageStyle = imageElement.getAttribute('imageStyle');
+      const alignAttribute = _getDataAttributeFromModelImageStyle(imageStyle);
+      existingValues['data-align'] = alignAttribute ? alignAttribute : 'none';
+
+      // The image caption is stored outside the imageElement model and must
+      // be retrieved to get its value.
+      const imageCaption = ImageCaptionUtils.getCaptionFromImageModelElement(imageElement);
+      console.log(imageCaption);
+      existingValues['data-has-caption'] = !!imageCaption;
+      if (imageCaption && imageCaption.childCount) {
+        const captionValue = editor.data.processor.toData(imageCaption.getChild(0));
+        existingValues['data-caption'] = captionValue;
+      }
+    }
     const saveCallback = (dialogValues) => {
       // Map the submitted form values to the CKEditor image model.
       let imageAttributes = {};
@@ -787,17 +831,35 @@ class BackdropImageCommand extends CKEditor5.core.Command {
         }
       });
 
+      // Set CKEditor Image Style from the data-align attribute.
+      const imageStyle = _getModelImageStyleFromDataAttribute(dialogValues.attributes['data-align']);
+      imageAttributes['imageStyle'] = imageStyle;
+
       // For updating an existing element:
       if (imageElement) {
         model.change(writer => {
           writer.setAttributes(imageAttributes, imageElement);
         });
+
+        const imageCaption = ImageCaptionUtils.getCaptionFromImageModelElement(imageElement);
+        // Remove an existing caption if disabled.
+        if (imageCaption && !dialogValues.attributes['data-has-caption']) {
+          editor.execute('toggleImageCaption');
+        }
+        // Add a caption if none yet exists and is enabled.
+        if (!imageCaption && dialogValues.attributes['data-has-caption']) {
+          editor.execute('toggleImageCaption');
+        }
       }
       // Inserting a new element:
       else {
         // Inserting an image has an unusual way of passing the attributes.
         // See https://ckeditor.com/docs/ckeditor5/latest/api/module_image_image_insertimagecommand-InsertImageCommand.html
         editor.execute('insertImage', { source: [imageAttributes] });
+        // @todo This does not yet work.
+        if (dialogValues.attributes['data-has-caption']) {
+          editor.execute('toggleImageCaption');
+        }
       }
     };
 

@@ -544,9 +544,7 @@ function ckeditor5_ckeditor5_plugins() {
         // image dialog. Additional attributes can be added here to prevent
         // CKEditor from striping out attributes on img tags.
         'extraAttributes' => array(
-          'dataAlign' => 'data-align',
           'dataFileId' => 'data-file-id',
-          'dataCaption' => 'data-caption',
           'alt' => 'alt',
           'src' => 'src',
           'width' => 'width',
@@ -577,7 +575,10 @@ function ckeditor5_ckeditor5_plugins() {
       ),
       'backdropImage' => array(
         'captionFilterEnabled' => TRUE,
-        'captionPlaceholderText' => t('Enter caption text here.')
+        'captionPlaceholderText' => t('Enter caption text here.'),
+        'extraAttributes' => array(
+          'dataCaption' => 'data-caption',
+        ),
       ),
     ),
   );
@@ -631,6 +632,11 @@ function ckeditor5_ckeditor5_plugins() {
               'title' => t('Align right and wrap text'),
             ),
           ),
+        ),
+      ),
+      'backdropImage' => array(
+        'extraAttributes' => array(
+          'dataAlign' => 'data-align',
         ),
       ),
     ),
