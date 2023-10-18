@@ -110,8 +110,8 @@ class BackdropLink extends CKEditor5.core.Plugin {
       const model = this.editor.model;
       const selection = model.document.selection;
 
-      // Wrapping the original command execution in a model.change() block to make sure there's a single undo step
-      // when the extra attribute is added.
+      // Wrapping the original command execution in a model.change() block to
+      // make sure there's a single undo step when the extra attribute is added.
       model.change(writer => {
         editor.execute('link', ...args);
 
@@ -142,7 +142,7 @@ class BackdropLink extends CKEditor5.core.Plugin {
           }
         });
       });
-    }, { priority: 'high' } );
+    }, { priority: 'highest' } );
   }
 
   _removeExtraAttributeOnUnlinkCommandExecute(modelName) {
