@@ -53,16 +53,10 @@ class BackdropImage extends CKEditor5.core.Plugin {
       schema.extend('imageInline', {
         allowAttributes: Object.keys(config.extraAttributes)
       });
-      schema.extend('imageInline', {
-        allowAttributes: ['htmlLinkAttributes'],
-      });
     }
     if (schema.isRegistered('imageBlock')) {
       schema.extend('imageBlock', {
         allowAttributes: Object.keys(config.extraAttributes)
-      });
-      schema.extend('imageBlock', {
-        allowAttributes: ['htmlLinkAttributes'],
       });
     }
 
@@ -71,6 +65,7 @@ class BackdropImage extends CKEditor5.core.Plugin {
       .for('upcast')
       .add(viewImageToModelImage(editor));
 
+    // Upcast any wrapping <a> element to be part of the CKEditor model.
     if (editor.plugins.has('DataFilter')) {
       const dataFilter = editor.plugins.get('DataFilter');
       conversion
@@ -751,7 +746,7 @@ function upcastImageBlockLinkGhsAttributes(dataFilter) {
 
   return (dispatcher) => {
     dispatcher.on('element:img', converter, {
-      priority: 'highest',
+      priority: 'high',
     });
   };
 }
