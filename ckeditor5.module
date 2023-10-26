@@ -428,6 +428,32 @@ function ckeditor5_ckeditor5_plugins() {
     'enabled_callback' => TRUE,
   );
 
+  // @see https://ckeditor.com/docs/ckeditor5/latest/features/text-transformation.html
+  $plugins['typing.TextTransformation'] = array(
+    // @todo: Provide a configuration option to toggle.
+    'enabled_callback' => TRUE,
+    'config' => array(
+      'typing' => array(
+        'transformations' => array(
+          'include' => array(
+            'typography',
+            'symbols',
+            'mathematical',
+          ),
+          // Extra items could also be placed in "include". This individual
+          // word is provided as an example that could be replaced.
+          'extra' => array(
+            array(
+              'from' => 'BackDrop',
+              'to' => 'Backdrop',
+            ),
+          ),
+          'remove' => array(),
+        ),
+      ),
+    ),
+  );
+
   // @see https://ckeditor.com/docs/ckeditor5/latest/features/tables/tables.html
   $plugins['table.Table'] = array(
     'buttons' => array(
