@@ -1,0 +1,27 @@
+/**
+ * @file
+ * Styles to maximize the editor.
+ */
+.ck.ck-editor.maximize-active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  z-index: 9999;
+  overflow: auto;
+}
+html.admin-bar .ck.ck-editor.maximize-active {
+  margin-top: 33px;
+  height: calc(100vh - 33px);
+}
+.maximize-active .ck.ck-editor__main {
+  flex-grow: 1;
+}
+.maximize-active .ck.ck-content {
+  height: 100%;
+}
