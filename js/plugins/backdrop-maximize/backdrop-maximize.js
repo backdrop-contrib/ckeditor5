@@ -27,13 +27,12 @@
           if (editorElement.classList.contains('maximize-active')) {
             editorElement.classList.remove('maximize-active');
             button.isOn = false;
-            editor.editing.view.focus();
           }
           else {
             editorElement.classList.add('maximize-active');
             button.isOn = true;
-            editor.editing.view.focus();
           }
+          editor.editing.view.focus();
         });
 
         return button;
