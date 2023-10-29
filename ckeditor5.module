@@ -768,6 +768,9 @@ function ckeditor5_ckeditor5_plugins() {
         'image' => $image_prefix . '/maximize.svg',
       ),
     ),
+    'config' => array(
+      'maximizeLabel' => t('Maximize'),
+    ),
   );
 
   // See https://ckeditor.com/docs/ckeditor5/latest/features/undo-redo.html
