@@ -12,7 +12,7 @@
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  z-index: 9994;
+  z-index: 999;
   overflow: auto;
 }
 html.admin-bar .ck.ck-editor.maximize-active {
