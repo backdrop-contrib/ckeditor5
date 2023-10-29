@@ -1,3 +1,7 @@
+/**
+ * @file
+ * Backdrop maximize plugin.
+ */
 (function (Backdrop, CKEditor5) {
 
   "use strict";
