@@ -5,6 +5,9 @@
 :root {
   --ck-z-modal: 9994 !important;
 }
+body.ck-scroll-prevented {
+  overflow: hidden;
+}
 .ck-maximize-active {
   position: fixed;
   top: 0;
@@ -22,8 +25,11 @@ html.admin-bar .ck-maximize-active {
   margin-top: 33px;
   height: calc(100vh - 33px);
 }
-.ck-maximize-active .ck.ck-editor__main {
+.ck-maximize-active .ck.ck-editor {
   flex-grow: 1;
+}
+.ck-maximize-active .ck.ck-editor__main {
+  height: calc(100% - 41px);
 }
 .ck-maximize-active .ck.ck-content {
   height: 100%;

@@ -28,10 +28,12 @@
 
           if (editorParent.classList.contains(activeClass)) {
             editorParent.classList.remove(activeClass);
+            document.body.classList.remove('ck-scroll-prevented');
             button.isOn = false;
           }
           else {
             editorParent.classList.add(activeClass);
+            document.body.classList.add('ck-scroll-prevented');
             button.isOn = true;
           }
           editor.editing.view.focus();
