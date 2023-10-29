@@ -3,7 +3,7 @@
  * Styles to maximize the editor.
  */
 :root {
-  --ck-z-modal: 9994 !important;
+  --ck-z-modal: 998 !important;
 }
 body.ck-scroll-prevented {
   overflow: hidden;
@@ -18,7 +18,7 @@ body.ck-scroll-prevented {
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  z-index: 9993;
+  z-index: 997;
   overflow: auto;
 }
 html.admin-bar .ck-maximize-active {
@@ -33,4 +33,11 @@ html.admin-bar .ck-maximize-active {
 }
 .ck-maximize-active .ck.ck-content {
   height: 100%;
+}
+/* In layout forms sticky header, height calc and positioning behave odd. */
+.layout-block-configure-form .ck-maximize-active .ck.ck-editor__main {
+  height: 70vh;
+}
+.layout-block-configure-form .ck-maximize-active .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
+  position: static !important;
 }
