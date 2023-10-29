@@ -12,6 +12,7 @@
 
       editor.ui.componentFactory.add( 'maximize', () => {
         const button = new CKEditor5.ui.ButtonView();
+        const activeClass = 'ck-maximize-active';
 
         button.set( {
           label: editor.config.get('maximizeLabel'),
@@ -22,14 +23,15 @@
         });
 
         button.on( 'execute', () => {
-          const editorElement = editor.ui.view.element;
+          // Applying the class to the parent keeps the sticky toolbar working.
+          const editorParent = editor.ui.view.element.parentNode;
 
-          if (editorElement.classList.contains('maximize-active')) {
-            editorElement.classList.remove('maximize-active');
+          if (editorParent.classList.contains(activeClass)) {
+            editorParent.classList.remove(activeClass);
             button.isOn = false;
           }
           else {
-            editorElement.classList.add('maximize-active');
+            editorParent.classList.add(activeClass);
             button.isOn = true;
           }
           editor.editing.view.focus();
