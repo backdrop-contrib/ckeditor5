@@ -3,10 +3,18 @@
  * Styles to maximize the editor.
  */
 :root {
-  --ck-z-modal: 998 !important;
+  /* Keep editor modal elements above maximized item. */
+  --ck-z-modal: 1002 !important;
 }
 body.ck-scroll-prevented {
+  /* Prevent double scroll bars with large content. */
   overflow: hidden;
+}
+.ck-maximize-active .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
+  /* Force to ignore the space for admin-bar. */
+  top: 0 !important;
+  /* Force full width. */
+  width: 100% !important;
 }
 .ck-maximize-active {
   position: fixed;
@@ -18,12 +26,8 @@ body.ck-scroll-prevented {
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  z-index: 997;
+  z-index: 1001;
   overflow: auto;
-}
-html.admin-bar .ck-maximize-active {
-  margin-top: 33px;
-  height: calc(100vh - 33px);
 }
 .ck-maximize-active .ck.ck-editor {
   flex-grow: 1;
@@ -33,11 +37,4 @@ html.admin-bar .ck-maximize-active {
 }
 .ck-maximize-active .ck.ck-content {
   height: 100%;
-}
-/* In layout forms sticky header, height calc and positioning behave odd. */
-.layout-block-configure-form .ck-maximize-active .ck.ck-editor__main {
-  height: 70vh;
-}
-.layout-block-configure-form .ck-maximize-active .ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
-  position: static !important;
 }

@@ -36,7 +36,9 @@
             document.body.classList.add('ck-scroll-prevented');
             button.isOn = true;
           }
+          window.dispatchEvent(new Event('resize'));
           editor.editing.view.focus();
+          editor.editing.view.scrollToTheSelection();
         });
 
         return button;
