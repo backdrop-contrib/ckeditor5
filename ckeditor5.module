@@ -930,7 +930,7 @@ function ckeditor5_get_config($format) {
   // settings from the Filter module. Prevents data loss for content not handled
   // by editor plugins.
   $config['htmlSupport'] = array();
-  [$config['htmlSupport']['allow'], $config['htmlSupport']['disallow']] = _ckeditor5_get_generic_html_settings($format);
+  list($config['htmlSupport']['allow'], $config['htmlSupport']['disallow']) = _ckeditor5_get_generic_html_settings($format);
 
   // Create a token for access to dialogs.
   if (in_array('backdropLink.BackdropLink', $plugins)) {
