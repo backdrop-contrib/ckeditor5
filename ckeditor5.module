@@ -507,6 +507,12 @@ function ckeditor5_ckeditor5_plugins() {
     ),
   );
 
+  // General HTML support is always enabled in Backdrop to provide compatibility
+  // with existing content and to preserve otherwise unsupported HTML tags.
+  $plugins['htmlSupport.GeneralHtmlSupport'] = array(
+    'enabled_callback' => TRUE,
+  );
+
   // @see https://ckeditor.com/docs/ckeditor5/latest/features/special-characters.html
   $plugins['specialCharacters.SpecialCharacters'] = array(
     'buttons' => array(
@@ -912,11 +918,6 @@ function ckeditor5_get_config($format) {
 
   // Remove duplicates from the plugin list (as happens with dependencies).
   $plugins = array_unique($plugins);
-
-  // We always load the GeneralHtmlSupport plugin.
-  if (!in_array('htmlSupport.GeneralHtmlSupport', $plugins)) {
-    $plugins[] = 'htmlSupport.GeneralHtmlSupport';
-  }
 
   // Initialize reasonable defaults that provide expected basic behavior.
   $config = array(
