@@ -156,12 +156,16 @@ class BackdropHtmlBuilder {
    *  A DOM element to be appended to the value.
    */
   _appendAttributes(node) {
-    Object.keys(node.attributes).forEach((attr) => {
+    // Sort attributes alphabetically for consistent output across browsers.
+    const sortedAttributes = Object.values(node.attributes).sort((a, b) => {
+      return a.name > b.name;
+    });
+    sortedAttributes.forEach((attribute) => {
       this._append(' ');
-      this._append(node.attributes[attr].name);
+      this._append(attribute.name);
       this._append('="');
       this._append(
-        this._escapeAttribute(node.attributes[attr].value),
+        this._escapeAttribute(attribute.value),
       );
       this._append('"');
     });
