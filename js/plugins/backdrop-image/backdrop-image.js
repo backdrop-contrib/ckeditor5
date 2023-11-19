@@ -1003,13 +1003,20 @@ class BackdropImageUploadAdapter {
     xhr.addEventListener('load', () => {
       const response = xhr.response;
 
-      if (!response || response.error) {
+      if (!response || !response.uploaded) {
         return reject(
           response && response.error && response.error.message
             ? response.error.message
             : genericErrorText,
         );
       }
+      // There still may be notifications on upload, like resized images.
+      if (response.error && response.error.message) {
+        // Placeholder for a styled notification message.
+        let markup = new DOMParser().parseFromString(response.error.message, 'text/html');
+        alert(markup.body.textContent);
+      }
+
       // Resolve with the `urls` property and pass the response
       // to allow customizing the behavior of features relying on the upload
       // adapters.
