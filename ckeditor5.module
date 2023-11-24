@@ -85,12 +85,6 @@ function ckeditor5_library_info() {
       array('filter', 'filter'),
       array('system', 'backdrop.ajax'),
       array('ckeditor5', 'ckeditor5'),
-      // CKEditor 5 does not provide its own plugin loader, so any added
-      // potentially needed plugins are added as dependencies.
-      // @todo: Improve loading to use libraries only when needed.
-      array('ckeditor5', 'backdrop.ckeditor5.backdrop-basic-styles'),
-      array('ckeditor5', 'backdrop.ckeditor5.backdrop-image'),
-      array('ckeditor5', 'backdrop.ckeditor5.backdrop-link'),
     ),
   );
 
