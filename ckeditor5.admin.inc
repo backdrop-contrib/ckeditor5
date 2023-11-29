@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Admin page callbacks for the CKEditor module.
+ * Admin page callbacks for the CKEditor 5 module.
  */
 
 /**
- * Editor settings callback; Provide options for CKEditor module.
+ * Editor settings callback; Provide options for CKEditor 5 module.
  */
 function ckeditor5_settings_form(&$form, $form_state, $format) {
   $plugins = ckeditor5_plugins();
@@ -204,4 +204,40 @@ function _ckeditor5_settings_stringify_style_list(array $style_list = NULL) {
     }
   }
   return $string;
+}
+
+/**
+ * Form callback for upgrading a text format from CKEditor 4 to CKEditor 5.
+ */
+function ckeditor5_upgrade_form($form, &$form_state, $format) {
+  backdrop_set_title(t('Upgrade %format to CKEditor 5', array('%format' => $format->name)), PASS_THROUGH);
+  $form['#format'] = $format;
+
+  $form['help'] = array(
+    '#type' => 'help',
+    '#markup' => t('Upgrading from CKEditor 4 to CKEditor 5 is a one-way process. The text format configuration can be restored using a <a href="!url">full site configuration export</a>, or by restoring the individual text format configuration file (!example). Back up the configuration now before continuing.', array(
+      '!url' => url('admin/config/development/configuration/full/export'),
+      '!example' => '<code>filter.format.' . $format->format . '.json</code>')
+    ),
+  );
+
+  $form['actions'] = array(
+    '#type' => 'actions',
+  );
+  $form['actions']['upgrade'] = array(
+    '#type' => 'submit',
+    '#value' => t('Confirm upgrade'),
+  );
+  return $form;
+}
+
+/**
+ * Submit handler for ckeditor5_upgrade_form().
+ */
+function ckeditor5_upgrade_form_submit($form, &$form_state) {
+  $format = $form['#format'];
+  $updated_format = ckeditor5_upgrade_format($format);
+  filter_format_save($updated_format);
+  backdrop_set_message(t('The %label text format has been upgraded from CKEditor 4 to CKEditor 5. Verify the CKEditor 5 toolbar and settings.', array('%label' => $format->name)));
+  $form_state['redirect'] = 'admin/config/content/formats/' . $format->format;
 }
