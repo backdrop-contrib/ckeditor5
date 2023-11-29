@@ -1352,14 +1352,20 @@ function _ckeditor5_theme_css($theme = NULL) {
  *
  * @param stdClass $format
  *   The text format to be upgraded.
+ * @param array $warnings
+ *   Any warnings that occurred during the upgrade.
  * @return stdClass
  *   The modified text format, ready to be saved with filter_format_save().
  *
  * @see filter_format_save()
  */
-function ckeditor5_upgrade_format($format) {
+function ckeditor5_upgrade_format($format, &$warnings) {
   $original_format = clone($format);
   $format->editor = 'ckeditor5';
+
+  $warnings = array(
+    'removed_buttons' => array(),
+  );
 
   // Get a list of button mappings between CKEditor 4 and 5 modules.
   $button_mapping = module_invoke_all('ckeditor5_upgrade_button_mapping');
@@ -1374,8 +1380,11 @@ function ckeditor5_upgrade_format($format) {
     foreach ($toolbar_row as $group_index => $toolbar_group) {
       $new_group = array();
       foreach ($toolbar_group['items'] as $button_name) {
-        if ($button_mapping[$button_name]) {
+        if (isset($button_mapping[$button_name])) {
           $new_group[] = $button_mapping[$button_name];
+        }
+        else {
+          $warnings['removed_buttons'][] = $button_name;
         }
       }
       // Add a separator between groups (but not at the end of the row).

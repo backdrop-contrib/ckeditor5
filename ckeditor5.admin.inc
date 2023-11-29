@@ -213,13 +213,26 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
   backdrop_set_title(t('Upgrade %format to CKEditor 5', array('%format' => $format->name)), PASS_THROUGH);
   $form['#format'] = $format;
 
+  $config_name = 'filter.format.' . $format->format;
   $form['help'] = array(
     '#type' => 'help',
-    '#markup' => t('Upgrading from CKEditor 4 to CKEditor 5 is a one-way process. The text format configuration can be restored using a <a href="!url">full site configuration export</a>, or by restoring the individual text format configuration file (!example). Back up the configuration now before continuing.', array(
-      '!url' => url('admin/config/development/configuration/full/export'),
-      '!example' => '<code>filter.format.' . $format->format . '.json</code>')
+    '#markup' => t('Upgrading from CKEditor 4 to CKEditor 5 is a one-way process. The text format configuration can be restored using a <a href="!full_export">full site configuration export</a>, or by restoring the individual text format configuration file (!example). Back up the configuration now before continuing.', array(
+      '!full_export' => url('admin/config/development/configuration/full/export'),
+      '!example' => '<code>' . l($config_name . '.json', 'admin/config/development/configuration/single/export', array('query' => array('group' => 'Text formats', 'name' => $config_name))) . '</code>')
     ),
   );
+
+  $warnings = array();
+  ckeditor5_upgrade_format($format, $warnings);
+  if (!empty($warnings['removed_buttons'])) {
+    $warning_message = '<p>' . t('The following toolbar buttons will removed in the upgrade:') . '</p>';
+    $warning_message .= theme('item_list', array('items' => $warnings['removed_buttons']));
+    $warning_message .= '<p>' . t('Some buttons are no longer needed in CKEditor 5, while others might not be supported. See the <a href="!url">CKEditor 5 change record</a> for more information.', array('!url' => 'https://docs.backdropcms.org/change-records/ckeditor5-upgrade')) . '</p>';
+    $form['warnings'] = array(
+      '#type' => 'markup',
+      '#markup' => $warning_message,
+    );
+  }
 
   $form['actions'] = array(
     '#type' => 'actions',
@@ -227,6 +240,12 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
   $form['actions']['upgrade'] = array(
     '#type' => 'submit',
     '#value' => t('Confirm upgrade'),
+    '#attributes' => array('class' => array('button-danger')),
+  );
+  $form['actions']['cancel'] = array(
+    '#type' => 'link',
+    '#href' => url('admin/config/content/formats/' . $format->format),
+    '#title' => t('Cancel'),
   );
   return $form;
 }
@@ -236,7 +255,8 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
  */
 function ckeditor5_upgrade_form_submit($form, &$form_state) {
   $format = $form['#format'];
-  $updated_format = ckeditor5_upgrade_format($format);
+  $warnings = array();
+  $updated_format = ckeditor5_upgrade_format($format, $warnings);
   filter_format_save($updated_format);
   backdrop_set_message(t('The %label text format has been upgraded from CKEditor 4 to CKEditor 5. Verify the CKEditor 5 toolbar and settings.', array('%label' => $format->name)));
   $form_state['redirect'] = 'admin/config/content/formats/' . $format->format;
