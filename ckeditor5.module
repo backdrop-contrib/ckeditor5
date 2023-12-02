@@ -399,16 +399,6 @@ function ckeditor5_ckeditor5_plugins() {
         'required_html' => array('<ol>', '<li>'),
       ),
     ),
-    'plugin_dependencies' => array('list.DocumentListProperties'),
-    'config' => array(
-      'list' => array(
-        'properties' => array(
-          'reversed' => TRUE,
-          'startIndex' => TRUE,
-          'styles' => array('useAttribute' => TRUE),
-        ),
-      ),
-    ),
   );
 
   // @see https://ckeditor.com/docs/ckeditor5/latest/features/code-blocks.html
