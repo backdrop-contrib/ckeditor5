@@ -1,0 +1,5 @@
+<?php
+/**
+ * @file
+ * Provides assisting code for testing a CKEditor 4 to CKEditor 5 upgrade.
+ */

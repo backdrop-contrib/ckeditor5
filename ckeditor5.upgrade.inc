@@ -28,7 +28,7 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
   }
   elseif (!empty($warnings['removed_buttons'])) {
     $warning_message = '<p>' . t('The following toolbar buttons will removed in the upgrade:') . '</p>';
-    $warning_message .= theme('item_list', array('items' => $warnings['removed_buttons']));
+    $warning_message .= theme('item_list', array('items' => $warnings['removed_buttons'], 'attributes' => array('class' => array('ckeditor5-removed-buttons-list'))));
     $warning_message .= '<p>' . t('Some buttons are no longer needed in CKEditor 5, while others might not be supported. See the <a href="!url">CKEditor 5 change record</a> for more information.', array('!url' => 'https://docs.backdropcms.org/change-records/ckeditor5-upgrade')) . '</p>';
     $form['warnings'] = array(
       '#type' => 'markup',
@@ -110,6 +110,10 @@ function ckeditor5_upgrade_warnings($format) {
  */
 function _ckeditor5_upgrade_format($original_format, &$warnings) {
   $format = clone($original_format);
+  foreach ($original_format->filters as $filter_name => $filter) {
+    $format->filters[$filter_name] = clone($filter);
+  }
+
   $warnings = array(
     'error' => NULL,
     'removed_buttons' => array(),
@@ -201,8 +205,9 @@ function _ckeditor5_upgrade_format($original_format, &$warnings) {
     unset($format->editor_settings['plugins']['style']);
   }
 
-  // Create the heading list based on allowed HTML tags.
-  if (!empty($format->filters['filter_html']->settings['allowed_html'])) {
+  // Adjust the settings based on allowed tags if filtered_html is enabled.
+  if (!empty($format->filters['filter_html']->status)) {
+    // Create the heading list based on allowed HTML tags.
     $tag_list = $format->filters['filter_html']->settings['allowed_html'];
     $tags = explode(' ', $tag_list);
     $new_tags = array();
@@ -213,10 +218,13 @@ function _ckeditor5_upgrade_format($original_format, &$warnings) {
       }
     }
     sort($new_tags);
-    $format->editor_settings['headings'] = backdrop_map_assoc($new_tags);
+    $format->editor_settings['heading_list'] = backdrop_map_assoc($new_tags);
+
+    // Add <u> to the list of allowed tags if the underline button is present.
+    $format->filters['filter_html']->settings['allowed_html'] = $tag_list . ' <u>';
   }
   else {
-    $format->editor_settings['headings'] = array(
+    $format->editor_settings['heading_list'] = array(
       'h1' => 'h1',
       'h2' => 'h2',
       'h3' => 'h3',
@@ -262,12 +270,13 @@ function ckeditor5_ckeditor5_upgrade_button_mapping() {
     'Paste' => NULL,
     'PasteText' => NULL,
     'PasteFromWord' => NULL,
+    // @todo Include showBlocks.ShowBlocks plugin and upgrade it.
     'ShowBlocks' => NULL,
     'RemoveFormat' => 'removeFormat',
     'SpecialChar' => 'specialCharacters',
     'Format' => 'heading',
     'Styles' => 'style',
-    'Table' => 'table',
+    'Table' => 'insertTable',
     // @todo Provide maximize button mapping when available.
     'Maximize' => NULL,
     'BackdropImage' => 'backdropImage',
