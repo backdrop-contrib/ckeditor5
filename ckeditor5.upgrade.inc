@@ -16,8 +16,10 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
   $form['help'] = array(
     '#type' => 'help',
     '#markup' => t('Upgrading from CKEditor 4 to CKEditor 5 is a one-way process. The text format configuration can be restored using a <a href="!full_export">full site configuration export</a>, or by restoring the individual text format configuration file (!example). Back up the configuration now before continuing.', array(
-        '!full_export' => url('admin/config/development/configuration/full/export'),
-        '!example' => '<code>' . l($config_name . '.json', 'admin/config/development/configuration/single/export', array('query' => array('group' => 'Text formats', 'name' => $config_name))) . '</code>')
+      '!full_export' => url('admin/config/development/configuration/full/export'),
+      '!example' =>'<code>' . l($config_name . '.json', 'admin/config/development/configuration/single/export', array(
+        'query' => array('group' => 'Text formats', 'name' => $config_name))
+      ) . '</code>')
     ),
   );
 
@@ -83,10 +85,10 @@ function ckeditor5_upgrade_format($format) {
  * Return any warnings that may occur during a CKEditor 4 to 5 upgrade.
  *
  * @param stdClass $format
- *    The text format to be upgraded.
+ *   The text format to be upgraded.
  *
  * @return array
- *    Any warnings that will occur during the upgrade.
+ *   Any warnings that will occur during the upgrade.
  */
 function ckeditor5_upgrade_warnings($format) {
   $warnings = array();
@@ -98,12 +100,12 @@ function ckeditor5_upgrade_warnings($format) {
  * Internal use only, performs the actual upgrade.
  *
  * @param stdClass $original_format
- *     The text format to be upgraded.
+ *   The text format to be upgraded.
  * @param array $warnings
- *     Any warnings that occur during the upgrade. Modified by reference.
+ *   Any warnings that occur during the upgrade. Modified by reference.
  *
  * @return stdClass
- *    The modified text format, ready to be saved with filter_format_save().
+ *   The modified text format, ready to be saved with filter_format_save().
  *
  * @see ckeditor5_upgrade_format()
  * @see ckeditor5_upgrade_warnings()
@@ -270,15 +272,13 @@ function ckeditor5_ckeditor5_upgrade_button_mapping() {
     'Paste' => NULL,
     'PasteText' => NULL,
     'PasteFromWord' => NULL,
-    // @todo Include showBlocks.ShowBlocks plugin and upgrade it.
-    'ShowBlocks' => NULL,
+    'ShowBlocks' => 'showBlocks',
     'RemoveFormat' => 'removeFormat',
     'SpecialChar' => 'specialCharacters',
     'Format' => 'heading',
     'Styles' => 'style',
     'Table' => 'insertTable',
-    // @todo Provide maximize button mapping when available.
-    'Maximize' => NULL,
+    'Maximize' => 'maximize',
     'BackdropImage' => 'backdropImage',
     'BackdropLink' => 'backdropLink',
     'BackdropUnlink' => NULL,
