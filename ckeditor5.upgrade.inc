@@ -17,7 +17,7 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
     '#type' => 'help',
     '#markup' => t('Upgrading from CKEditor 4 to CKEditor 5 is a one-way process. The text format configuration can be restored using a <a href="!full_export">full site configuration export</a>, or by restoring the individual text format configuration file (!example). Back up the configuration now before continuing.', array(
       '!full_export' => url('admin/config/development/configuration/full/export'),
-      '!example' =>'<code>' . l($config_name . '.json', 'admin/config/development/configuration/single/export', array(
+      '!example' => '<code>' . l($config_name . '.json', 'admin/config/development/configuration/single/export', array(
         'query' => array('group' => 'Text formats', 'name' => $config_name))
       ) . '</code>')
     ),
@@ -30,7 +30,12 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
   }
   elseif (!empty($warnings['removed_buttons'])) {
     $warning_message = '<p>' . t('The following toolbar buttons will removed in the upgrade:') . '</p>';
-    $warning_message .= theme('item_list', array('items' => $warnings['removed_buttons'], 'attributes' => array('class' => array('ckeditor5-removed-buttons-list'))));
+    $warning_message .= theme('item_list', array(
+      'items' => $warnings['removed_buttons'],
+      'attributes' => array(
+        'class' => array('ckeditor5-removed-buttons-list'))
+      )
+    );
     $warning_message .= '<p>' . t('Some buttons are no longer needed in CKEditor 5, while others might not be supported. See the <a href="!url">CKEditor 5 change record</a> for more information.', array('!url' => 'https://docs.backdropcms.org/change-records/ckeditor5-upgrade')) . '</p>';
     $form['warnings'] = array(
       '#type' => 'markup',
@@ -223,7 +228,9 @@ function _ckeditor5_upgrade_format($original_format, &$warnings) {
     $format->editor_settings['heading_list'] = backdrop_map_assoc($new_tags);
 
     // Add <u> to the list of allowed tags if the underline button is present.
-    $format->filters['filter_html']->settings['allowed_html'] = $tag_list . ' <u>';
+    if (in_array('underline', $new_toolbar) && !in_array('<u>', $new_tags)) {
+      $format->filters['filter_html']->settings['allowed_html'] = $tag_list . ' <u>';
+    }
   }
   else {
     $format->editor_settings['heading_list'] = array(

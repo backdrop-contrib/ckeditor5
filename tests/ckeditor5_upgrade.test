@@ -56,7 +56,7 @@ class CKEditor5UpgradeTestCase extends BackdropWebTestCase {
     $this->clickLink(t('CKEditor 5 upgrade page'));
 
     $elements = $this->xpath('//ul[contains(@class, :class)]/li', array(':class' => 'ckeditor5-removed-buttons-list'));
-    $this->assertEqual(count($elements), 8, 'Expected number of removed buttons shown.');
+    $this->assertEqual(count($elements), 6, 'Expected number of removed buttons shown.');
 
     // Execute the upgrade.
     $this->backdropPost(NULL, array(), t('Confirm upgrade'));
@@ -67,7 +67,7 @@ class CKEditor5UpgradeTestCase extends BackdropWebTestCase {
 
     // Note that the original text format had 3 rows, the new one should only
     // have two. Confirm no empty groups are left.
-    $this->assertFieldByName('editor_settings[cketoolbar]', '["bold","italic","blockQuote","style","heading","|","bulletedList","numberedList","|","alignment:left","alignment:center","alignment:right","alignment:justify","|","backdropLink","|","backdropImage","|","sourceEditing","removeFormat","-","underline","strikethrough","|","superscript","subscript","|","undo","redo","|","horizontalLine","specialCharacters","insertTable"]', 'Toolbar settings upgraded as expected.');
+    $this->assertFieldByName('editor_settings[cketoolbar]', '["bold","italic","blockQuote","style","heading","|","bulletedList","numberedList","|","alignment:left","alignment:center","alignment:right","alignment:justify","|","backdropLink","|","backdropImage","|","sourceEditing","removeFormat","maximize","-","underline","strikethrough","|","superscript","subscript","|","undo","redo","|","horizontalLine","showBlocks","specialCharacters","insertTable"]', 'Toolbar settings upgraded as expected.');
 
     $this->assertFieldChecked('edit-editor-settings-image-upload-status');
     $this->assertFieldChecked('edit-editor-settings-image-upload-orientate');
@@ -98,7 +98,7 @@ class CKEditor5UpgradeTestCase extends BackdropWebTestCase {
     $new_tag_list2 = $ckeditor5_format1->filters['filter_html']->settings['allowed_html'];
     $this->assertEqual($new_tag_list1, $new_tag_list2);
     $this->assertRaw(t('Allowed HTML tags: @tags', array('@tags' => $new_tag_list1)), 'Complete new tag list found.');
-    $this->assertNoRaw(check_plain('<u> <u>'), 'Newly added <u> tag only added once.');
+    $this->assertNoRaw(check_plain('<u> <u>'), check_plain('Newly added <u> tag only added once.'));
 
     // Upgrade the second text format. This text format is the same as the first
     // one, except it has the Filtered HTML filter disabled. This affects the
@@ -116,5 +116,20 @@ class CKEditor5UpgradeTestCase extends BackdropWebTestCase {
     $this->assertFieldChecked('edit-editor-settings-heading-list-h4');
     $this->assertFieldChecked('edit-editor-settings-heading-list-h5');
     $this->assertFieldChecked('edit-editor-settings-heading-list-h6');
+
+    // Upgrade the third text format. This text format contains a "TestButton"
+    // button in the toolbar and will be modified by the alter hooks in the
+    // ckeditor5_upgrade_test.module.
+    $ckeditor4_format3 = filter_format_load('ckeditor_upgrade3');
+    $this->backdropGet('admin/config/content/formats/ckeditor_upgrade3/ckeditor5-upgrade');
+    $this->backdropPost(NULL, array(), t('Confirm upgrade'));
+    $this->assertRaw(t('The %label text format has been upgraded from CKEditor 4 to CKEditor 5. Verify the CKEditor 5 toolbar and settings.', array('%label' => $ckeditor4_format3->name)));
+
+    // All heading types should be enabled to match CKEditor 4's behavior of
+    // showing all allowed headings.
+    $this->assertFieldByName('editor_settings[cketoolbar]', '["bold","italic","blockQuote","heading","|","bulletedList","numberedList","|","alignment:left","alignment:center","alignment:right","|","backdropLink","|","backdropImage","|","sourceEditing","maximize","testButton"]', 'Toolbar includes the testButton provided by alter hook.');
+    $old_tag_list = $ckeditor4_format3->filters['filter_html']->settings['allowed_html'];
+    $new_tag_list1 = $old_tag_list . ' <test-tag>';
+    $this->assertRaw(t('Allowed HTML tags: @tags', array('@tags' => $new_tag_list1)), check_plain('Alter list of tags includes the added <test-tag>.'));
   }
 }
