@@ -54,7 +54,7 @@ function ckeditor5_upgrade_form($form, &$form_state, $format) {
   );
   $form['actions']['cancel'] = array(
     '#type' => 'link',
-    '#href' => url('admin/config/content/formats/' . $format->format),
+    '#href' => 'admin/config/content/formats/' . $format->format,
     '#title' => t('Cancel'),
   );
   return $form;
