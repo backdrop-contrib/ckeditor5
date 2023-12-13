@@ -8,7 +8,6 @@
  * Implements hook_ckeditor5_upgrade_button_mapping_alter().
  */
 function ckeditor5_upgrade_test_ckeditor5_upgrade_button_mapping_alter(&$button_mapping) {
-  // cspell:ignore ckeditor_upgrade3
   // Map a test button (present in ckeditor_upgrade3 text format).
   $button_mapping['TestButton'] = 'testButton';
 }

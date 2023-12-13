@@ -170,8 +170,8 @@ function hook_ckeditor5_settings_alter(array &$settings, $format) {
  * upgrade.
  *
  * At the very least, it's probable that the capitalization of the button will
- * change. CKEditor 4 buttons were usually camel-case (such as "RemoveFormat"),
- * while CKEditor 5 buttons are usually snake-case (such as "removeFormat").
+ * change. CKEditor 4 buttons were usually Pascal-case (such as "RemoveFormat"),
+ * while CKEditor 5 buttons are usually camel-case (such as "removeFormat").
  *
  * @return array
  *   An array of key-value pairs of strings.

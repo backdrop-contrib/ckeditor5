@@ -26,20 +26,12 @@ class CKEditor5UpgradeTestCase extends BackdropWebTestCase {
     // "ckeditor5_upgrade_test" module.
     parent::setUp(array('ckeditor', 'ckeditor5', 'ckeditor5_upgrade_test'));
 
-    // Create Article node type.
-    $content_type = $this->backdropCreateContentType(array(
-      'type' => 'article',
-      'name' => 'Article',
-    ));
-    node_add_body_field($content_type);
-
     // Create and log in as the admin user.
     $this->adminUser = $this->backdropCreateUser(array(
       'administer filters',
       'access administration pages',
       'access content',
       'administer nodes',
-      'create article content',
     ));
     $this->backdropLogin($this->adminUser);
   }
