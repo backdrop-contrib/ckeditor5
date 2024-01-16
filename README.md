@@ -1,5 +1,14 @@
-CKEditor 5
-==========
+CKEditor 5 (obsolete)
+=====================
+
+Important note: CKEditor 5 module was moved into Backdrop core in version
+1.27.0. Use of this module is no longer necessary and no further changes will be
+made here. If you would like to report a bug or feature request against CKEditor
+5 module, file an issue in the main Backdrop CMS core repository at
+https://github.com/backdrop/backdrop-issues.
+
+<hr>
+
 This module integrates CKEditor 5 with Backdrop CMS, providing a modern rich
 text editor. This module is being developed in contrib as a candidate to be
 included in a future version of Backdrop core.
@@ -13,18 +22,12 @@ based on CKEditor 4), this module provides matching functionality, including:
 * Drag and drop toolbar configuration.
 * Automatic configuration of text format HTML tags based on toolbar.
 
-There is not yetany kind of upgrade path from CKEditor 4 to 5, other than
-reconfiguring an editor to match the previous CKEditor 4 configuration.
-
 Requirements
 ------------
-Backdrop core. You can enable CKEditor 4 and 5 modules on the same site,
-as long as they are configured on different text formats.
 
 CKEditor 5 does not support Internet Explorer. An up-to-date browser is
 required. See
 [CKEditor Browser Compatibility](https://ckeditor.com/docs/ckeditor5/latest/support/browser-compatibility.html).
-
 
 Installation
 ------------
@@ -37,12 +40,6 @@ Installation
 - Drag and drop toolbar items to configure a toolbar for the editor.
 - Additional configuration settings for file and image uploading, style and
   heading lists are in a vertical tab set below the toolbar.
-
-Issues
-------
-Bugs and Feature Requests should be reported in the Issue Queue:
-https://github.com/backdrop-contrib/ckeditor5/issues.
-
 
 Current Maintainers
 -------------------
